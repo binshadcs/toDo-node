@@ -1,33 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="main.css">
-</head>
-<body>
-<main>
-    <div>
-        <h2>To Do List</h2>
+<%- include('partials/header.ejs'); -%>
 
-    </div>
-    <form action="/add" method="post">
-        <input type="text" name="text" id="text">
-        <input type="submit" value="add">
-        <ul>
-            <% if(locals.list){ %>
-                <% for(value of list) {%>
-                    <li>
-                        <input type="checkbox" name="checked" id="checked"><del>
-                        <%= value %></del>
-                    </li>
-                <% } %>
-            <% }else{ %>
-                <h4>Add To Do</h4>
-            <% } %>
-        </ul>
-    </form>
-</main>
-</body>
-</html>
+  <div class="box" id="heading">
+    <h1>
+      <%= listTitle %>
+    </h1>
+  </div>
+  <div class="box">
+    <% for(let item of listItems){%>
+      <div class="item">
+        <!-- Delete item -->
+        <form action="/delete" method="post">
+          <input type="checkbox" onchange="this.form.submit()" name="deleteItemId" value="<%= item.id %>">
+        </form>
+
+        <p id="title<%=item.id%>">
+          <%= item.title %>
+        </p>
+        <!-- Edit item -->
+        <form class="edit" action="/edit" method="post">
+          <input type="hidden" name="updatedItemId" value="<%= item.id %>">
+          <input id="input<%=item.id%>" type="text" name="updatedItemTitle" value="<%= item.title %>" autocomplete="off"
+            autofocus="true" hidden="true" />
+          <button id="done<%=item.id%>" class="edit" type="submit" hidden><img class="icon"
+              src="/assets/icons/check-solid.svg" alt="tick image"></button>
+        </form>
+        <button id="edit<%=item.id%>" class="edit" onclick="handler('<%=item.id%>')"><img class="icon"
+            src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
+      </div>
+      <% } %>
+
+        <form class="item" action="/add" method="post">
+          <input type="text" name="newItem" autocomplete="off" autofocus="true" placeholder="<%= locals.error ? error :  'New Item'%>"/>
+          <button class="add" type="submit" name="list" value=<%=listTitle %> >+</button>
+        </form>
+  </div>
+
+  <script>
+    function handler(id) {
+      document.getElementById("title" + id).setAttribute("hidden", true)
+      document.getElementById("edit" + id).setAttribute("hidden", true)
+      document.getElementById("done" + id).removeAttribute("hidden")
+      document.getElementById("input" + id).removeAttribute("hidden")
+    }
+  </script>
+  <%- include('partials/footer.ejs'); -%>
